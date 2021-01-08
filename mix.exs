@@ -7,7 +7,12 @@ defmodule ExFirebaseAuth.MixProject do
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      package: package(),
+      docs: [
+        main: "readme",
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -25,7 +30,19 @@ defmodule ExFirebaseAuth.MixProject do
     [
       {:jose, "~> 1.10"},
       {:finch, "~> 0.3.1"},
-      {:jason, "~> 1.2.2"}
+      {:jason, "~> 1.2.2"},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+    ]
+  end
+
+  defp package do
+    [
+      description: "Handling Firebase Auth 'ID tokens' in Elixir",
+      links: %{
+        "github" => "https://github.com/Nickforall/ExFirebaseAuth",
+        "documentation" => "https://hexdocs.pm/ex_firebase_auth"
+      },
+      licenses: ["MIT"]
     ]
   end
 end

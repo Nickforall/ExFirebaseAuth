@@ -27,10 +27,19 @@ def deps do
 end
 ```
 
-And add the Firebase auth issuer name for your project to your `config.exs`.
+## Usage
+
+Add the Firebase auth issuer name for your project to your `config.exs`. This is required to make sure only your project's firebase tokens are accepted.
 
 ```elixir
 config :ex_firebase_auth, :issuer, "https://securetoken.google.com/hoody-16c66"
+```
+
+Verifying a token
+
+```elixir
+ExFirebaseAuth.Token.verify_token("Some token string")
+iex> {:ok, "userid", %{}}
 ```
 
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
