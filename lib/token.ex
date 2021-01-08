@@ -6,7 +6,14 @@ defmodule ExFirebaseAuth.Token do
   @spec verify_token(binary) ::
           {:error, binary} | {:ok, binary(), JOSE.JWT.t()}
   @doc """
-  Verifies a token agains google's public keys. Returns {:ok, sub, data} if successful. {:error, _} otherwise.
+  Verifies a token agains google's public keys. Returns {:ok, user_id, claims} if successful. {:error, _} otherwise.
+
+  ## Examples
+    iex> ExFirebaseAuth.Token.verify_token("ey.some.token")
+    {:ok, "user id", %{}}
+
+    iex> ExFirebaseAuth.Token.verify_token("ey.some.token")
+    {:error, "Invalid JWT header, `kid` missing"}
   """
   def verify_token(token_string) do
     issuer = Application.fetch_env!(:ex_firebase_auth, :issuer)

@@ -2,6 +2,8 @@
 
 ExFirebaseAuth is a library that handles ID tokens from Firebase, which is useful for using Firebase's auth solution because Firebase does not have an Elixir SDK for auth themselves.
 
+[More information on how ID tokens work in Firebase Auth](https://firebase.google.com/docs/auth/admin/verify-id-tokens)
+
 This library
 
 - Keeps track of google's public keys used for signing ID tokens
