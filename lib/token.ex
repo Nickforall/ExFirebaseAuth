@@ -13,7 +13,7 @@ defmodule ExFirebaseAuth.Token do
   @doc ~S"""
   Returns the configured issuer
 
-    ## Examples
+  ## Examples
 
       iex> ExFirebaseAuth.Token.issuer()
       "https://securetoken.google.com/project-123abc"

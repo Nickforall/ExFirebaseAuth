@@ -45,8 +45,9 @@ defmodule ExFirebaseAuth.Mock do
   Generates a firebase-like ID token with the mock's private key. Will raise when mock is not enabled.
 
   ## Examples
-    iex> ExFirebaseAuth.Mock.generate_token("userid", %{"claim" => "value"})
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlLCJpc3MiOiJqb2UifQ.shLcxOl_HBBsOTvPnskfIlxHUibPN7Y9T4LhPB-iBwM"
+
+      iex> ExFirebaseAuth.Mock.generate_token("userid", %{"claim" => "value"})
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlLCJpc3MiOiJqb2UifQ.shLcxOl_HBBsOTvPnskfIlxHUibPN7Y9T4LhPB-iBwM"
   """
   def generate_token(sub, claims \\ %{}) do
     unless is_enabled?() do
