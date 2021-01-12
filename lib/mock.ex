@@ -42,17 +42,21 @@ defmodule ExFirebaseAuth.Mock do
 
   @spec generate_token(String.t(), map) :: String.t()
   @doc ~S"""
-  Generates a firebase-like ID token with the mock's private key
+  Generates a firebase-like ID token with the mock's private key. Will raise when mock is not enabled.
 
   ## Examples
     iex> ExFirebaseAuth.Mock.generate_token("userid", %{"claim" => "value"})
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlLCJpc3MiOiJqb2UifQ.shLcxOl_HBBsOTvPnskfIlxHUibPN7Y9T4LhPB-iBwM"
   """
   def generate_token(sub, claims \\ %{}) do
+    unless is_enabled?() do
+      raise "Cannot generate mocked token, because ExFirebaseAuth.Mock is not enabled in your config."
+    end
+
     {kid, jwk} = get_private_key()
 
     jws = %{
-      "alg" => "HS256",
+      "alg" => "RS256",
       "kid" => kid
     }
 
@@ -67,7 +71,7 @@ defmodule ExFirebaseAuth.Mock do
     payload
   end
 
-  defp mock_config, do: Application.get_env(:ex_firebase_auth, :mock)
+  defp mock_config, do: Application.get_env(:ex_firebase_auth, :mock, [])
 
   defp find_or_create_private_key_table do
     case :ets.whereis(ExFirebaseAuth.Mock) do
@@ -77,7 +81,7 @@ defmodule ExFirebaseAuth.Mock do
   end
 
   defp get_private_key do
-    case :ets.first(ExFirebaseAuth.Mock) do
+    case :ets.lookup(ExFirebaseAuth.Mock, :ets.first(ExFirebaseAuth.Mock)) do
       [] -> raise "No private key set for ExFirebaseAuth.Mock, is mock enabled?"
       [{_kid, _key} = value] -> value
     end
