@@ -12,10 +12,17 @@ defmodule ExFirebaseAuth.KeyStore do
   end
 
   def init(_) do
+    find_or_create_ets_table()
+
     case fetch_certificates() do
       # when we could not fetch certs initially the application cannot run because all Auth will fail
-      :error -> {:stop, "Initial certificate fetch failed"}
-      {:ok, data} -> {:ok, data}
+      :error ->
+        {:stop, "Initial certificate fetch failed"}
+
+      {:ok, data} ->
+        store_data_to_ets(data)
+
+        {:ok, %{}}
     end
   end
 
@@ -26,23 +33,38 @@ defmodule ExFirebaseAuth.KeyStore do
       :error ->
         Logger.warn("Fetching firebase auth certificates failed, using old state and retrying...")
         schedule_refresh(10)
+
         {:noreply, state}
 
       # if everything went okay, refresh at the regular interval and store the returned keys in state
       {:ok, jsondata} ->
-        Logger.debug("Fetched new firebase auth certificates")
+        Logger.debug("Fetched new firebase auth certificates.")
+        store_data_to_ets(jsondata)
         schedule_refresh()
-        {:noreply, jsondata}
+
+        {:noreply, state}
     end
   end
 
-  # Use a {:get, id} call to get the JWK struct of the certificate with the given key id. Returns nil if not found
-  # Usage: `GenServer.call(ExFirebaseAuth.KeyStore, {:get, keyid})`
-  def handle_call({:get, key_id}, _from, state) do
-    case Map.get(state, key_id) do
-      nil -> {:reply, nil, state}
-      key -> {:reply, JOSE.JWK.from_pem(key), state}
+  defp find_or_create_ets_table do
+    case :ets.whereis(ExFirebaseAuth.KeyStore) do
+      :undefined -> :ets.new(ExFirebaseAuth.KeyStore, [:set, :public, :named_table])
+      table -> table
     end
+  end
+
+  defp store_data_to_ets(jsondata) do
+    jsondata
+    |> Enum.map(fn {key, value} ->
+      case JOSE.JWK.from_pem(value) do
+        [] -> {key, nil}
+        jwk -> {key, jwk}
+      end
+    end)
+    |> Enum.filter(fn {_, value} -> not is_nil(value) end)
+    |> Enum.each(fn {key, value} ->
+      :ets.insert(ExFirebaseAuth.KeyStore, {key, value})
+    end)
   end
 
   defp schedule_refresh(after_s \\ 3600) do

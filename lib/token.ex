@@ -1,6 +1,12 @@
 defmodule ExFirebaseAuth.Token do
   defp get_public_key(keyid) do
-    GenServer.call(ExFirebaseAuth.KeyStore, {:get, keyid})
+    case :ets.lookup(ExFirebaseAuth.KeyStore, keyid) do
+      [{_keyid, key}] ->
+        key
+
+      [] ->
+        nil
+    end
   end
 
   @spec verify_token(binary) ::
@@ -32,7 +38,7 @@ defmodule ExFirebaseAuth.Token do
         {:error, "Invalid JWT header, `kid` missing"}
 
       {:key, _} ->
-        {:error, "Public key retrieved from google could not be parsed"}
+        {:error, "Public key retrieved from google was not found or could not be parsed"}
 
       {:verify, _} ->
         {:error, "None of public keys matched auth token's key ids"}
