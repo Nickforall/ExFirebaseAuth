@@ -46,7 +46,7 @@ defmodule ExFirebaseAuth.KeyStore do
     end
   end
 
-  defp find_or_create_ets_table do
+  def find_or_create_ets_table do
     case :ets.whereis(ExFirebaseAuth.KeyStore) do
       :undefined -> :ets.new(ExFirebaseAuth.KeyStore, [:set, :public, :named_table])
       table -> table
