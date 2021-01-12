@@ -1,6 +1,6 @@
 # Changelog
 
-## Next Release
+## 0.2.0
 
 - Improve performance of fetching public keys by storing them in an ETS table
 - Added `ExFirebaseAuth.Mock` for writing integration tests with ID tokens
