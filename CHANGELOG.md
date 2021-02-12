@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- Tweaked the refresh interval of fetching private keys from Google
+
 ## 0.2.0
 
 - Improve performance of fetching public keys by storing them in an ETS table
