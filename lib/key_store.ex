@@ -67,7 +67,7 @@ defmodule ExFirebaseAuth.KeyStore do
     end)
   end
 
-  defp schedule_refresh(after_s \\ 3600) do
+  defp schedule_refresh(after_s \\ 300) do
     Process.send_after(self(), :refresh, after_s * 1000)
   end
 
