@@ -29,7 +29,7 @@ defmodule ExFirebaseAuth.KeyStore do
 
   # When the refresh `info` is sent, we want to fetch the certificates
   def handle_info(:refresh, state) do
-    case fetch_certificates() |> IO.inspect() do
+    case fetch_certificates() do
       # keep trying with a lower interval, until then keep the old state
       :error ->
         Logger.warn("Fetching firebase auth certificates failed, using old state and retrying...")

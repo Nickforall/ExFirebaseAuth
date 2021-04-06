@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0
+## 0.3.1
 
 - Fixed an issue where token store was never refreshed
 
