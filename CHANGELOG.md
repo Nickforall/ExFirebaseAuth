@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0
+
+- Fixed an issue where token store was never refreshed
+
 ## 0.2.1
 
 - Tweaked the refresh interval of fetching private keys from Google
