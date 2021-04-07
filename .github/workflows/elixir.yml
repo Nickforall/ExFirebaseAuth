@@ -1,0 +1,78 @@
+# https://github.com/absinthe-graphql/absinthe/blob/master/.github/workflows/elixir.yml
+# Copyright (c) Bruce Williams, Ben Wilson
+
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Elixir ${{matrix.elixir}} / OTP ${{matrix.otp}}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        elixir:
+          - "1.10"
+          - "1.11"
+        otp:
+          - "22"
+          - "23"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Elixir
+        uses: erlef/setup-elixir@v1
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+
+      - name: Restore deps cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            deps
+            _build
+          key: deps-${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('**/mix.lock') }}-${{ github.sha }}
+          restore-keys: |
+            deps-${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('**/mix.lock') }}
+            deps-${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}
+
+      - name: Create dializer plts path
+        run: mkdir -p priv/plts
+
+      - name: Restore plts cache
+        uses: actions/cache@v2
+        with:
+          path: priv/plts
+          key: plts-${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('**/mix.lock') }}-${{ github.sha }}
+          restore-keys: |
+            plts-${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles('**/mix.lock') }}
+            plts-${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}
+
+      - name: Install package dependencies
+        run: mix deps.get
+
+      - name: Check Formatting
+        run: mix format --check-formatted
+
+      - name: Run unit tests
+        run: |
+          mix clean
+          mix test
+
+      - name: Run unit tests with persistent_term backend
+        run: |
+          mix clean
+          mix test
+        env:
+          SCHEMA_PROVIDER: persistent_term
+
+      - name: Run dialyzer
+        run: mix dialyzer
