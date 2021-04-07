@@ -51,6 +51,12 @@ defmodule ExFirebaseAuth.Token do
       {:key, _} ->
         {:error, "Public key retrieved from google was not found or could not be parsed"}
 
+      {:verify, {false, _, _}} ->
+        {:error, "Invalid signature"}
+
+      {:verify, {true, _, _}} ->
+        {:error, "Signed by invalid issuer"}
+
       {:verify, _} ->
         {:error, "None of public keys matched auth token's key ids"}
     end
