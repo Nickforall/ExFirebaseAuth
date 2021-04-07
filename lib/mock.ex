@@ -31,13 +31,20 @@ defmodule ExFirebaseAuth.Mock do
     private_table = find_or_create_private_key_table()
     public_table = ExFirebaseAuth.KeyStore.find_or_create_ets_table()
 
+    {kid, public_key, private_key} = generate_key()
+
+    :ets.insert(private_table, {kid, private_key})
+    :ets.insert(public_table, {kid, public_key})
+  end
+
+  @doc false
+  def generate_key do
     private_key = JOSE.JWS.generate_key(%{"alg" => "RS256"})
     public_key = JOSE.JWK.to_public(private_key)
 
     kid = JOSE.JWK.thumbprint(:md5, public_key)
 
-    :ets.insert(private_table, {kid, private_key})
-    :ets.insert(public_table, {kid, public_key})
+    {kid, public_key, private_key}
   end
 
   @spec generate_token(String.t(), map) :: String.t()
