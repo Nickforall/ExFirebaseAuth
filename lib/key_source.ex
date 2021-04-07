@@ -3,7 +3,11 @@ defmodule ExFirebaseAuth.KeySource do
 
   @callback fetch_certificates() :: :error | {:ok, list(JOSE.JWK.t())}
 
-  @source Application.get_env(:ex_firebase_auth, :key_source, ExFirebaseAuth.KeySource.Google)
-
-  defdelegate fetch_certificates, to: @source
+  def fetch_certificates do
+    apply(
+      Application.get_env(:ex_firebase_auth, :key_source, ExFirebaseAuth.KeySource.Google),
+      :fetch_certificates,
+      []
+    )
+  end
 end

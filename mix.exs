@@ -9,6 +9,7 @@ defmodule ExFirebaseAuth.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
+      aliases: [test: "test"],
       docs: [
         main: "readme",
         extras: ["README.md"]
