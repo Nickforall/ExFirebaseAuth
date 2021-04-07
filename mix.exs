@@ -5,10 +5,11 @@ defmodule ExFirebaseAuth.MixProject do
     [
       app: :ex_firebase_auth,
       version: "0.3.1",
-      elixir: "~> 1.11",
+      elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
+      aliases: [test: "test"],
       docs: [
         main: "readme",
         extras: ["README.md"]
