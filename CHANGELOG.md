@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.0
+
+- Support Elixir 1.10
+- Added a pluggable KeySource for testing of library
+- Added more comprehensive errors for invalid tokens
+- Added tests
+
 ## 0.3.1
 
 - Fixed an issue where token store was never refreshed
