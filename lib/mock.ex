@@ -28,6 +28,10 @@ defmodule ExFirebaseAuth.Mock do
   you probably do not need this.**
   """
   def generate_and_store_key_pair do
+    unless is_enabled?() do
+      raise "Cannot generate mocked token, because ExFirebaseAuth.Mock is not enabled in your config."
+    end
+
     private_table = find_or_create_private_key_table()
     public_table = ExFirebaseAuth.KeyStore.find_or_create_ets_table()
 

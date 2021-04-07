@@ -101,8 +101,7 @@ defmodule ExFirebaseAuth.TokenTest do
     sub = Enum.random(?a..?z)
     Application.put_env(:ex_firebase_auth, :issuer, "issuer")
 
-    private_key = JOSE.JWS.generate_key(%{"alg" => "RS256"})
-    public_key = JOSE.JWK.to_public(private_key)
+    {_invalid_kid, public_key, private_key} = Mock.generate_key()
 
     _invalid_kid = JOSE.JWK.thumbprint(:md5, public_key)
     [{valid_kid, _}] = :ets.lookup(ExFirebaseAuth.Mock, :ets.first(ExFirebaseAuth.Mock))
