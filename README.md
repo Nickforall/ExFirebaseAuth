@@ -1,23 +1,21 @@
 # ExFirebaseAuth 🔥
 
-ExFirebaseAuth is a library that handles ID tokens from Firebase, which is useful for using Firebase's auth solution because Firebase does not have an Elixir SDK for auth themselves. ExFirebaseAuth also comes with some testing utilities that mock and generate ID tokens for your integration tests.
+[![CI](https://github.com/Nickforall/ExFirebaseAuth/actions/workflows/elixir.yml/badge.svg)](https://github.com/Nickforall/ExFirebaseAuth/actions/workflows/elixir.yml)
 
-[More information on how ID tokens work in Firebase Auth](https://firebase.google.com/docs/auth/admin/verify-id-tokens)
+ExFirebaseAuth is an Elixir library to handle ID Tokens from the [Firebase Authentication service](https://firebase.google.com/products/auth).
 
-This library
+This library:
 
-- Keeps track of google's public keys used for signing ID tokens
-- Verifies ID tokens
-- Veries whether the issuer matches your firebase project
+- validates ID Tokens and unpack its user information
+- keeps track of Google public keys used for signing ID Tokens
+- comes with test utils to mock ID Tokens in dev/test environments
+- does not aim to implement the Firebase Admin SDK endpoints
 
-This library does **not**
-
-- Aim to implement Firebase user admin SDK endpoints
+[Read more about Firebase Authentication ID Tokens here.](https://firebase.google.com/docs/auth/admin/verify-id-tokens)
 
 ## Installation
 
-If [available in Hex](https://hex.pm/packages/ex_firebase_auth), the package can be installed
-by adding `ex_firebase_auth` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `ex_firebase_auth` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -27,21 +25,38 @@ def deps do
 end
 ```
 
-## Usage
+## Configuration
 
-Add the Firebase auth issuer name for your project to your `config.exs`. This is required to make sure only your project's firebase tokens are accepted.
+Configure the ID Token issuer in your `config.exs`. This is required to ensure that only ID Tokens from your own project will be accepted:
 
 ```elixir
 config :ex_firebase_auth, :issuer, "https://securetoken.google.com/project-123abc"
 ```
 
-Verifying a token
+## Usage
+
+To verify an ID Token, use `ExFirebaseAuth.Token.verify_token/1`:
 
 ```elixir
-ExFirebaseAuth.Token.verify_token("Some token string")
-iex> {:ok, "userid", %{}}
+
+iex(1)> ExFirebaseAuth.Token.verify_token("<Some valid Firebase ID Token goes here>")
+{:ok, "<User UID goes here>",
+  %JOSE.JWT{
+    fields: %{
+      "email" => "jose@valim.com",
+      "email_verified" => true,
+      "name" => "<User name>",
+      "picture" => "<User picture URL>",
+      "user_id" => "<User UID>",
+      # (...) among other fields (...)
+    }
+  }}
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/ex_firebase_auth](https://hexdocs.pm/ex_firebase_auth).
+> _Note: be careful to not confuse User UIDs with Firebase ID Tokens. Firebase UIDs are normal unique user IDs, while Firebase ID Tokens are full-featured JSON Web Tokens, meant for cross-system user authentication._
+
+Complete documentation can be found at [https://hexdocs.pm/ex_firebase_auth](https://hexdocs.pm/ex_firebase_auth/).
+
+## License
+
+[MIT](LICENSE)
