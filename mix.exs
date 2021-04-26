@@ -38,10 +38,9 @@ defmodule ExFirebaseAuth.MixProject do
 
   defp package do
     [
-      description: "Handling Firebase Auth 'ID tokens' in Elixir",
+      description: "Handle ID Tokens from the Firebase Authentication service",
       links: %{
-        "github" => "https://github.com/Nickforall/ExFirebaseAuth",
-        "documentation" => "https://hexdocs.pm/ex_firebase_auth"
+        "GitHub" => "https://github.com/Nickforall/ExFirebaseAuth"
       },
       licenses: ["MIT"]
     ]
