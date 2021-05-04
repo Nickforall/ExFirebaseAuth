@@ -1,7 +1,7 @@
 defmodule ExFirebaseAuth.KeySource do
   @moduledoc false
 
-  @callback fetch_certificates() :: :error | {:ok, list(JOSE.JWK.t())}
+  @callback fetch_certificates() :: :error | {:ok, list(JOSE.JWK.t()), integer()}
 
   def fetch_certificates do
     apply(
