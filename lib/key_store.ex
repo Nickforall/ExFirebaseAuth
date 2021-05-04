@@ -13,9 +13,12 @@ defmodule ExFirebaseAuth.KeyStore do
     find_or_create_ets_table()
 
     case ExFirebaseAuth.KeySource.fetch_certificates() do
-      # when we could not fetch certs initially the application cannot run because all Auth will fail
       :error ->
-        {:stop, "Initial certificate fetch failed"}
+        Logger.warn("Fetching firebase auth certificates failed. Retrying again shortly.")
+
+        schedule_refresh(10)
+
+        {:ok, %{}}
 
       {:ok, data} ->
         store_data_to_ets(data)
