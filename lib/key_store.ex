@@ -1,5 +1,22 @@
 defmodule ExFirebaseAuth.KeyStore do
-  @moduledoc false
+  @moduledoc """
+  The KeyStore handles fetching public keys from Google's servers to verify public keys with
+
+  ## Warnings
+
+  By default ExFirebaseAuth.KeyStore will stop when the initial fetch failed. This behavior can be
+  changed by the following config key:
+
+  ```
+  config :ex_firebase_auth, :key_store_fail_strategy, :silent
+  ```
+
+  The following values are available
+
+  - `:stop`: Stops server after initial fetch fails.
+  - `:warn`: Logs a warning message with Logger. Continues retrying to fetch.
+  - `:silent`: Silently retries fetching new public keys, without warning when failing.
+  """
 
   use GenServer, restart: :transient
 
@@ -32,7 +49,7 @@ defmodule ExFirebaseAuth.KeyStore do
              """
                Initial certificate fetch failed
 
-               If you want to run ExFirebaseAuth offline, add the following key to your config
+               If you want to run ExFirebaseAuth offline during tests or development, add the following key to your config
 
                ```
                config :ex_firebase_auth, :key_store_fail_strategy, :silent
@@ -40,7 +57,9 @@ defmodule ExFirebaseAuth.KeyStore do
              """}
 
           :warn ->
-            Logger.warn("Fetching firebase auth certificates failed. Retrying again shortly.")
+            unless key_store_fail_strategy() == :silent do
+              Logger.warn("Fetching firebase auth certificates failed. Retrying again shortly.")
+            end
 
             schedule_refresh(10)
 
@@ -82,6 +101,7 @@ defmodule ExFirebaseAuth.KeyStore do
     {:noreply, state}
   end
 
+  @doc false
   def find_or_create_ets_table do
     case :ets.whereis(ExFirebaseAuth.KeyStore) do
       :undefined -> :ets.new(ExFirebaseAuth.KeyStore, [:set, :public, :named_table])
