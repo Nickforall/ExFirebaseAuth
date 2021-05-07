@@ -28,7 +28,16 @@ defmodule ExFirebaseAuth.KeyStore do
       :error ->
         case key_store_fail_strategy() do
           :stop ->
-            {:stop, "Initial certificate fetch failed"}
+            {:stop,
+             """
+               Initial certificate fetch failed
+
+               If you want to run ExFirebaseAuth offline, add the following key to your config
+
+               ```
+               config :ex_firebase_auth, :key_store_fail_strategy, :silent
+               ```
+             """}
 
           :warn ->
             Logger.warn("Fetching firebase auth certificates failed. Retrying again shortly.")
