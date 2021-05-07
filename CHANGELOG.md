@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.4.1
+
+- Add config value to prevent KeyStore from crashing (@lucasavila00 #19)
+
 ## 0.4.0
 
 - Support Elixir 1.10
