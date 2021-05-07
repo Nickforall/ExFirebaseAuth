@@ -9,13 +9,39 @@ defmodule ExFirebaseAuth.KeyStore do
     GenServer.start_link(__MODULE__, %{}, name: ExFirebaseAuth.KeyStore)
   end
 
+  @spec key_store_fail_strategy :: :stop | :warn | :silent
+  @doc ~S"""
+  Returns the configured key_store_fail_strategy
+
+  ## Examples
+
+      iex> ExFirebaseAuth.Token.key_store_fail_strategy()
+      :stop
+  """
+  def key_store_fail_strategy,
+    do: Application.get_env(:ex_firebase_auth, :key_store_fail_strategy, :stop)
+
   def init(_) do
     find_or_create_ets_table()
 
     case ExFirebaseAuth.KeySource.fetch_certificates() do
-      # when we could not fetch certs initially the application cannot run because all Auth will fail
       :error ->
-        {:stop, "Initial certificate fetch failed"}
+        case key_store_fail_strategy() do
+          :stop ->
+            {:stop, "Initial certificate fetch failed"}
+
+          :warn ->
+            Logger.warn("Fetching firebase auth certificates failed. Retrying again shortly.")
+
+            schedule_refresh(10)
+
+            {:ok, %{}}
+
+          :silent ->
+            schedule_refresh(10)
+
+            {:ok, %{}}
+        end
 
       {:ok, data} ->
         store_data_to_ets(data)
