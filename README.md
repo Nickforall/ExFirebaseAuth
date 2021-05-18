@@ -22,7 +22,7 @@ by adding `ex_firebase_auth` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:ex_firebase_auth, "~> 0.4.1"}
+    {:ex_firebase_auth, "~> 0.4.2"}
   ]
 end
 ```
