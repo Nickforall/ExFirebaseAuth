@@ -71,12 +71,12 @@ defmodule ExFirebaseAuth.KeyStore do
             {:ok, %{}}
         end
 
-      {:ok, data} ->
+      {:ok, data, maxAge} ->
         store_data_to_ets(data)
 
         Logger.debug("Fetched initial firebase auth certificates.")
 
-        schedule_refresh()
+        schedule_refresh(maxAge)
 
         {:ok, %{}}
     end
@@ -91,11 +91,11 @@ defmodule ExFirebaseAuth.KeyStore do
         schedule_refresh(10)
 
       # if everything went okay, refresh at the regular interval and store the returned keys in state
-      {:ok, keys} ->
+      {:ok, keys, maxAge} ->
         store_data_to_ets(keys)
 
         Logger.debug("Fetched new firebase auth certificates.")
-        schedule_refresh()
+        schedule_refresh(maxAge)
     end
 
     {:noreply, state}
@@ -116,7 +116,7 @@ defmodule ExFirebaseAuth.KeyStore do
     end)
   end
 
-  defp schedule_refresh(after_s \\ 300) do
+  defp schedule_refresh(after_s) do
     Process.send_after(self(), :refresh, after_s * 1000)
   end
 end

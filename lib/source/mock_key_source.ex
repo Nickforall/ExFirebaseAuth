@@ -8,6 +8,6 @@ defmodule ExFirebaseAuth.KeySource.Mock do
   end
 
   def fetch_certificates do
-    {:ok, config()[:keys]}
+    {:ok, config()[:keys], 300}
   end
 end
