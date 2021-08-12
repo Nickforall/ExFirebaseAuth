@@ -60,5 +60,8 @@ defmodule ExFirebaseAuth.Token do
       {:verify, _} ->
         {:error, "None of public keys matched auth token's key ids"}
     end
+  rescue
+    _ ->
+      {:error, "Invalid JWT"}
   end
 end

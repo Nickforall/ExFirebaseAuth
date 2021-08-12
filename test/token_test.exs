@@ -143,4 +143,12 @@ defmodule ExFirebaseAuth.TokenTest do
 
     assert {:error, "Signed by invalid issuer"} = Token.verify_token(token)
   end
+
+  test "Does fail on invalid JWT" do
+    Application.put_env(:ex_firebase_auth, :issuer, "issuer")
+
+    invalid_token = :crypto.strong_rand_bytes(128) |> Base.encode64()
+
+    assert {:error, "Invalid JWT"} = Token.verify_token(invalid_token)
+  end
 end
