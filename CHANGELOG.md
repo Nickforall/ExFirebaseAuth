@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+- Verify expiration date of token
+- Do not raise on a wrongly formatted JWT
+- Update dependencies to support telemetry 1.0
+
 ## 0.4.2
 
 - OTP 24 support
