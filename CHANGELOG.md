@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1
+
+- Set default expiry on mocked token to 1 hour from utc now.
+
 ## 0.5.0
 
 - Verify expiration date of token
