@@ -72,6 +72,10 @@ defmodule ExFirebaseAuth.Mock do
       "kid" => kid
     }
 
+    # Put exp claim, unless previously specified in claims
+    exp = DateTime.utc_now() |> DateTime.add(3600, :second) |> DateTime.to_unix()
+    claims = Map.put_new(claims, "exp", exp)
+
     jwt =
       Map.merge(claims, %{
         "iss" => ExFirebaseAuth.Token.issuer(),
