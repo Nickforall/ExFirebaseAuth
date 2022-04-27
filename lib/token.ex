@@ -71,7 +71,7 @@ defmodule ExFirebaseAuth.Token do
          {:key, %JOSE.JWK{} = key} <- {:key, get_public_key(kid)},
          # check if verify returns true and issuer matches
          {:verify, {true, %{fields: %{"iss" => ^issuer, "sub" => sub, "exp" => exp}} = data, _}} <-
-           {:verify, JOSE.JWT.verify(key, token_string)} |> IO.inspect(),
+           {:verify, JOSE.JWT.verify(key, token_string)},
          # Verify exp date
          {:verify, {:ok, _}} <- {:verify, verify_expiry(exp)} do
       {:ok, sub, data}
