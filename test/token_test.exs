@@ -24,6 +24,61 @@ defmodule ExFirebaseAuth.TokenTest do
     end)
   end
 
+  describe "Token.verify_cookie/1" do
+    test "Does succeed on correct token" do
+      issuer = Enum.random(?a..?z)
+      Application.put_env(:ex_firebase_auth, :cookie_issuer, issuer)
+
+      sub = Enum.random(?a..?z)
+      time_in_future = DateTime.utc_now() |> DateTime.add(360, :second) |> DateTime.to_unix()
+      claims = %{"exp" => time_in_future}
+      valid_token = Mock.generate_cookie(sub, claims)
+      assert {:ok, ^sub, jwt} = Token.verify_cookie(valid_token)
+
+      %JOSE.JWT{
+        fields: %{
+          "iss" => iss_claim,
+          "sub" => sub_claim
+        }
+      } = jwt
+
+      assert sub_claim == sub
+      assert iss_claim == issuer
+    end
+
+    test "Does raise on no issuer being set" do
+      Application.put_env(:ex_firebase_auth, :cookie_issuer, "issuer")
+      valid_token = Mock.generate_cookie("subsub")
+      Application.delete_env(:ex_firebase_auth, :cookie_issuer)
+
+      assert_raise(
+        ArgumentError,
+        ~r/^could not fetch application environment :cookie_issuer for application :ex_firebase_auth because configuration at :cookie_issuer was not set/,
+        fn ->
+          Token.verify_cookie(valid_token)
+        end
+      )
+    end
+
+    test "Does fail on no `kid` being set in JWT header" do
+      sub = Enum.random(?a..?z)
+      Application.put_env(:ex_firebase_auth, :cookie_issuer, "issuer")
+
+      token =
+        generate_token(
+          %{
+            "sub" => sub,
+            "iss" => "issuer"
+          },
+          %{
+            "alg" => "RS256"
+          }
+        )
+
+      assert {:error, "Invalid JWT header, `kid` missing"} = Token.verify_cookie(token)
+    end
+  end
+
   describe "Token.verify_token/1" do
     test "Does succeed on correct token" do
       issuer = Enum.random(?a..?z)

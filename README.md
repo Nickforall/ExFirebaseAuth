@@ -32,13 +32,23 @@ end
 Add the Firebase auth issuer name for your project to your `config.exs`. This is required to make sure only your project's firebase tokens are accepted.
 
 ```elixir
-config :ex_firebase_auth, :issuer, "https://securetoken.google.com/project-123abc"
+config :ex_firebase_auth,
+  issuer: "https://securetoken.google.com/project-123abc",
+  # See https://cloud.google.com/identity-platform/docs/reference/rest/v1/projects/createSessionCookie
+  cookie_issuer: "https://session.firebase.google.com/project-123abc"
 ```
 
 Verifying a token
 
 ```elixir
 ExFirebaseAuth.Token.verify_token("Some token string")
+iex> {:ok, "userid", %{}}
+```
+
+Verifying a cookie
+
+```elixir
+ExFirebaseAuth.Token.verify_cookie("Some token string")
 iex> {:ok, "userid", %{}}
 ```
 

@@ -20,10 +20,21 @@ defmodule ExFirebaseAuth.Token do
   """
   def issuer, do: Application.fetch_env!(:ex_firebase_auth, :issuer)
 
+  @spec cookie_issuer :: String.t()
+  @doc ~S"""
+  Returns the configured issuer
+
+  ## Examples
+
+      iex> ExFirebaseAuth.Token.issuer()
+      "https://session.firebase.google.com/project-123abc"
+  """
+  def cookie_issuer, do: Application.fetch_env!(:ex_firebase_auth, :cookie_issuer)
+
   @spec verify_token(String.t()) ::
           {:error, String.t()} | {:ok, String.t(), JOSE.JWT.t()}
   @doc ~S"""
-  Verifies a token agains google's public keys. Returns {:ok, user_id, claims} if successful. {:error, _} otherwise.
+  Verifies a token agains Google's public keys. Returns {:ok, user_id, claims} if successful. {:error, _} otherwise.
 
   ## Examples
 
@@ -34,14 +45,33 @@ defmodule ExFirebaseAuth.Token do
       {:error, "Invalid JWT header, `kid` missing"}
   """
   def verify_token(token_string) do
-    issuer = issuer()
+    do_verify_token(token_string, issuer())
+  end
 
+  @spec verify_cookie(String.t()) ::
+          {:error, String.t()} | {:ok, String.t(), JOSE.JWT.t()}
+  @doc ~S"""
+  Verifies a cookie token agains Google's public keys. Returns {:ok, user_id, claims} if successful. {:error, _} otherwise.
+
+  ## Examples
+
+      iex> ExFirebaseAuth.Token.verify_cookie("ey.some.token")
+      {:ok, "user id", %{}}
+
+      iex> ExFirebaseAuth.Token.verify_cookie("ey.some.token")
+      {:error, "Invalid JWT header, `kid` missing"}
+  """
+  def verify_cookie(cookie_string) do
+    do_verify_token(cookie_string, cookie_issuer())
+  end
+
+  defp do_verify_token(token_string, issuer) do
     with {:jwtheader, %{fields: %{"kid" => kid}}} <- peek_token_kid(token_string),
          # read key from store
          {:key, %JOSE.JWK{} = key} <- {:key, get_public_key(kid)},
          # check if verify returns true and issuer matches
          {:verify, {true, %{fields: %{"iss" => ^issuer, "sub" => sub, "exp" => exp}} = data, _}} <-
-           {:verify, JOSE.JWT.verify(key, token_string)},
+           {:verify, JOSE.JWT.verify(key, token_string)} |> IO.inspect(),
          # Verify exp date
          {:verify, {:ok, _}} <- {:verify, verify_expiry(exp)} do
       {:ok, sub, data}
