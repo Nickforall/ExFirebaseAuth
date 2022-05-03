@@ -9,20 +9,20 @@ defmodule ExFirebaseAuth.Cookie do
   """
   def issuer, do: Application.fetch_env!(:ex_firebase_auth, :cookie_issuer)
 
-  @spec verify(String.t()) ::
+  @spec verify_cookie(String.t()) ::
           {:error, String.t()} | {:ok, String.t(), JOSE.JWT.t()}
   @doc ~S"""
   Verifies a cookie token agains Google's public keys. Returns {:ok, user_id, claims} if successful. {:error, _} otherwise.
 
   ## Examples
 
-      iex> ExFirebaseAuth.Cookie.verify("ey.some.token")
+      iex> ExFirebaseAuth.Cookie.verify_cookie("ey.some.token")
       {:ok, "user id", %{}}
 
-      iex> ExFirebaseAuth.Cookie.verify("ey.some.token")
+      iex> ExFirebaseAuth.Cookie.verify_cookie("ey.some.token")
       {:error, "Invalid JWT header, `kid` missing"}
   """
-  def verify(cookie_string) do
+  def verify_cookie(cookie_string) do
     ExFirebaseAuth.Token.verify_token(cookie_string, issuer())
   end
 end

@@ -24,7 +24,7 @@ defmodule ExFirebaseAuth.CookieTest do
     end)
   end
 
-  describe "Cookie.verify/1" do
+  describe "Cookie.verify_cookie/1" do
     test "Does succeed on correct token" do
       issuer = Enum.random(?a..?z)
       Application.put_env(:ex_firebase_auth, :cookie_issuer, issuer)
@@ -33,7 +33,7 @@ defmodule ExFirebaseAuth.CookieTest do
       time_in_future = DateTime.utc_now() |> DateTime.add(360, :second) |> DateTime.to_unix()
       claims = %{"exp" => time_in_future}
       valid_token = Mock.generate_cookie(sub, claims)
-      assert {:ok, ^sub, jwt} = Cookie.verify(valid_token)
+      assert {:ok, ^sub, jwt} = Cookie.verify_cookie(valid_token)
 
       %JOSE.JWT{
         fields: %{
@@ -55,7 +55,7 @@ defmodule ExFirebaseAuth.CookieTest do
         ArgumentError,
         ~r/^could not fetch application environment :cookie_issuer for application :ex_firebase_auth because configuration at :cookie_issuer was not set/,
         fn ->
-          Cookie.verify(valid_token)
+          Cookie.verify_cookie(valid_token)
         end
       )
     end
@@ -75,7 +75,7 @@ defmodule ExFirebaseAuth.CookieTest do
           }
         )
 
-      assert {:error, "Invalid JWT header, `kid` missing"} = Cookie.verify(token)
+      assert {:error, "Invalid JWT header, `kid` missing"} = Cookie.verify_cookie(token)
     end
   end
 
@@ -96,7 +96,7 @@ defmodule ExFirebaseAuth.CookieTest do
       )
 
     assert {:error, "Public key retrieved from google was not found or could not be parsed"} =
-             Cookie.verify(token)
+             Cookie.verify_cookie(token)
   end
 
   test "Does fail on invalid signature with non-matching kid" do
@@ -122,7 +122,7 @@ defmodule ExFirebaseAuth.CookieTest do
       )
       |> JOSE.JWS.compact()
 
-    assert {:error, "Invalid signature"} = Cookie.verify(token)
+    assert {:error, "Invalid signature"} = Cookie.verify_cookie(token)
   end
 
   test "Does fail on invalid issuer" do
@@ -143,7 +143,7 @@ defmodule ExFirebaseAuth.CookieTest do
         }
       )
 
-    assert {:error, "Signed by invalid issuer"} = Cookie.verify(token)
+    assert {:error, "Signed by invalid issuer"} = Cookie.verify_cookie(token)
   end
 
   test "Does fail on invalid JWT with raised exception handled" do
@@ -151,7 +151,7 @@ defmodule ExFirebaseAuth.CookieTest do
 
     invalid_token = "invalid.jwt.token"
 
-    assert {:error, "Invalid JWT"} = Cookie.verify(invalid_token)
+    assert {:error, "Invalid JWT"} = Cookie.verify_cookie(invalid_token)
   end
 
   test "Does fail on expired JWT" do
@@ -165,6 +165,6 @@ defmodule ExFirebaseAuth.CookieTest do
 
     valid_token = Mock.generate_cookie(sub, claims)
 
-    assert {:error, "Expired JWT"} = Cookie.verify(valid_token)
+    assert {:error, "Expired JWT"} = Cookie.verify_cookie(valid_token)
   end
 end

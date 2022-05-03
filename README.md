@@ -48,7 +48,7 @@ iex> {:ok, "userid", %{}}
 Verifying a cookie
 
 ```elixir
-ExFirebaseAuth.Token.verify_cookie("Some token string")
+ExFirebaseAuth.Cookie.verify_cookie("Some token string")
 iex> {:ok, "userid", %{}}
 ```
 
