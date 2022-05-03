@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Added support for verifying session cookies.
+- Added `ExFirebaseAuth.Cookie` to support for verifying session cookies.
 
 ## 0.5.1
 

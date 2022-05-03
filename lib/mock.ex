@@ -114,7 +114,7 @@ defmodule ExFirebaseAuth.Mock do
 
     jwt =
       Map.merge(claims, %{
-        "iss" => ExFirebaseAuth.Token.cookie_issuer(),
+        "iss" => ExFirebaseAuth.Cookie.issuer(),
         "sub" => sub
       })
 
