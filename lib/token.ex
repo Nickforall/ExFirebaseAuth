@@ -23,7 +23,7 @@ defmodule ExFirebaseAuth.Token do
   @spec verify_token(String.t()) ::
           {:error, String.t()} | {:ok, String.t(), JOSE.JWT.t()}
   @doc ~S"""
-  Verifies a token agains google's public keys. Returns {:ok, user_id, claims} if successful. {:error, _} otherwise.
+  Verifies a token agains Google's public keys. Returns {:ok, user_id, claims} if successful. {:error, _} otherwise.
 
   ## Examples
 
@@ -34,8 +34,10 @@ defmodule ExFirebaseAuth.Token do
       {:error, "Invalid JWT header, `kid` missing"}
   """
   def verify_token(token_string) do
-    issuer = issuer()
+    verify_token(token_string, issuer())
+  end
 
+  def verify_token(token_string, issuer) do
     with {:jwtheader, %{fields: %{"kid" => kid}}} <- peek_token_kid(token_string),
          # read key from store
          {:key, %JOSE.JWK{} = key} <- {:key, get_public_key(kid)},

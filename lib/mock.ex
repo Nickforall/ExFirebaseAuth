@@ -87,6 +87,42 @@ defmodule ExFirebaseAuth.Mock do
     payload
   end
 
+  @spec generate_cookie(String.t(), map) :: String.t()
+  @doc ~S"""
+  Generates a firebase-like session cookie token with the mock's private key. Will raise when mock is not enabled.
+
+  ## Examples
+
+      iex> ExFirebaseAuth.Mock.generate_cookie("userid", %{"claim" => "value"})
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlLCJpc3MiOiJqb2UifQ.shLcxOl_HBBsOTvPnskfIlxHUibPN7Y9T4LhPB-iBwM"
+  """
+  def generate_cookie(sub, claims \\ %{}) do
+    unless is_enabled?() do
+      raise "Cannot generate mocked token, because ExFirebaseAuth.Mock is not enabled in your config."
+    end
+
+    {kid, jwk} = get_private_key()
+
+    jws = %{
+      "alg" => "RS256",
+      "kid" => kid
+    }
+
+    # Put exp claim, unless previously specified in claims
+    exp = DateTime.utc_now() |> DateTime.add(3600, :second) |> DateTime.to_unix()
+    claims = Map.put_new(claims, "exp", exp)
+
+    jwt =
+      Map.merge(claims, %{
+        "iss" => ExFirebaseAuth.Cookie.issuer(),
+        "sub" => sub
+      })
+
+    {_, payload} = JOSE.JWT.sign(jwk, jws, jwt) |> JOSE.JWS.compact()
+
+    payload
+  end
+
   defp mock_config, do: Application.get_env(:ex_firebase_auth, :mock, [])
 
   defp find_or_create_private_key_table do
