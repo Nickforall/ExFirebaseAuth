@@ -23,7 +23,7 @@ defmodule ExFirebaseAuth.Token do
   @spec verify_token(String.t()) ::
           {:error, String.t()} | {:ok, String.t(), JOSE.JWT.t()}
   @doc ~S"""
-  Verifies a token agains Google's public keys. Returns {:ok, user_id, claims} if successful. {:error, _} otherwise.
+  Verifies a token against Google's public keys. Returns {:ok, user_id, claims} if successful. {:error, _} otherwise.
 
   ## Examples
 
