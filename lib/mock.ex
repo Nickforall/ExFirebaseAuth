@@ -60,7 +60,7 @@ defmodule ExFirebaseAuth.Mock do
       iex> ExFirebaseAuth.Mock.generate_token("userid", %{"claim" => "value"})
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlLCJpc3MiOiJqb2UifQ.shLcxOl_HBBsOTvPnskfIlxHUibPN7Y9T4LhPB-iBwM"
   """
-  def generate_token(sub, claims \\ %{}) do
+  def generate_token(sub, claims \\ %{}, app \\ :ex_firebase_auth) do
     unless is_enabled?() do
       raise "Cannot generate mocked token, because ExFirebaseAuth.Mock is not enabled in your config."
     end
@@ -78,7 +78,7 @@ defmodule ExFirebaseAuth.Mock do
 
     jwt =
       Map.merge(claims, %{
-        "iss" => ExFirebaseAuth.Token.issuer(),
+        "iss" => ExFirebaseAuth.Token.issuer(app),
         "sub" => sub
       })
 

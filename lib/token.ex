@@ -23,7 +23,9 @@ defmodule ExFirebaseAuth.Token do
   """
   def issuer(app \\ @default_app), do: do_get_issuer(app)
   defp do_get_issuer(@default_app), do: Application.fetch_env!(@default_app, :issuer)
-  defp do_get_issuer(app), do: Application.fetch_env!(app, @default_app) |> Keyword.fetch!(:issuer)
+
+  defp do_get_issuer(app),
+    do: Application.fetch_env!(app, @default_app) |> Keyword.fetch!(:issuer)
 
   @spec verify_token(String.t(), atom()) ::
           {:error, String.t()} | {:ok, String.t(), JOSE.JWT.t()}
@@ -39,7 +41,7 @@ defmodule ExFirebaseAuth.Token do
       {:error, "Invalid JWT header, `kid` missing"}
   """
   def verify_token(token_string, app \\ @default_app) do
-    issuer = issuer(app)
+    issuer = issuer(app) |> IO.inspect(label: :verify_token_issuer)
 
     with {:jwtheader, %{fields: %{"kid" => kid}}} <- peek_token_kid(token_string),
          # read key from store
