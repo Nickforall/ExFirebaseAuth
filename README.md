@@ -34,7 +34,7 @@ Add the Firebase auth issuer name for your project to your `config.exs`. This is
 ```elixir
 config :ex_firebase_auth, :issuer, "https://securetoken.google.com/project-123abc"
 ```
-or if you'd like to define a different issue per app
+or if you'd like to define a different issuer per app
 ```elixir
 config :your_app, :ex_firebase_auth, 
   issuer: "https://securetoken.google.com/project-123abc"
