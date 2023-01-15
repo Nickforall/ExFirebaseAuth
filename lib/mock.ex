@@ -51,7 +51,7 @@ defmodule ExFirebaseAuth.Mock do
     {kid, public_key, private_key}
   end
 
-  @spec generate_token(String.t(), map) :: String.t()
+  @spec generate_token(String.t(), map, atom) :: String.t()
   @doc ~S"""
   Generates a firebase-like ID token with the mock's private key. Will raise when mock is not enabled.
 
@@ -59,6 +59,9 @@ defmodule ExFirebaseAuth.Mock do
 
       iex> ExFirebaseAuth.Mock.generate_token("userid", %{"claim" => "value"})
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlLCJpc3MiOiJqb2UifQ.shLcxOl_HBBsOTvPnskfIlxHUibPN7Y9T4LhPB-iBwM"
+
+      iex> ExFirebaseAuth.Mock.generate_token("userid", %{"claim" => "value"}, :your_app)
+      "aeHaajfIOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlLCJpc3MiOiJqb2UifQ.shLcxOl_HBBsOTvPnskfIlxHUibPN7Y9T4LhPB-iBwM"
   """
   def generate_token(sub, claims \\ %{}, app \\ :ex_firebase_auth) do
     unless is_enabled?() do

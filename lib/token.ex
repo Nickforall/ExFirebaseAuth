@@ -20,6 +20,9 @@ defmodule ExFirebaseAuth.Token do
 
       iex> ExFirebaseAuth.Token.issuer()
       "https://securetoken.google.com/project-123abc"
+
+      iex> ExFirebaseAuth.Token.issuer(:my_other_project)
+      "https://securetoken.google.com/other-project-123abc"
   """
   def issuer(app \\ @default_app), do: do_get_issuer(app)
   defp do_get_issuer(@default_app), do: Application.fetch_env!(@default_app, :issuer)
@@ -35,6 +38,9 @@ defmodule ExFirebaseAuth.Token do
   ## Examples
 
       iex> ExFirebaseAuth.Token.verify_token("ey.some.token")
+      {:ok, "user id", %{}}
+
+      iex> ExFirebaseAuth.Token.verify_token("ey.some.token", :my_app)
       {:ok, "user id", %{}}
 
       iex> ExFirebaseAuth.Token.verify_token("ey.some.token")
