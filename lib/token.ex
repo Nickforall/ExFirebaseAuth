@@ -47,7 +47,7 @@ defmodule ExFirebaseAuth.Token do
       {:error, "Invalid JWT header, `kid` missing"}
   """
   def verify_token(token_string, app \\ @default_app) do
-    issuer = issuer(app) |> IO.inspect(label: :verify_token_issuer)
+    issuer = issuer(app)
 
     with {:jwtheader, %{fields: %{"kid" => kid}}} <- peek_token_kid(token_string),
          # read key from store
