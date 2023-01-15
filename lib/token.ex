@@ -9,7 +9,10 @@ defmodule ExFirebaseAuth.Token do
     end
   end
 
-  @spec issuer :: String.t()
+  @default_app :ex_firebase_auth
+
+  @spec issuer() :: String.t()
+  @spec issuer(atom()) :: String.t()
   @doc ~S"""
   Returns the configured issuer
 
@@ -18,9 +21,11 @@ defmodule ExFirebaseAuth.Token do
       iex> ExFirebaseAuth.Token.issuer()
       "https://securetoken.google.com/project-123abc"
   """
-  def issuer, do: Application.fetch_env!(:ex_firebase_auth, :issuer)
+  def issuer(app \\ @default_app), do: do_get_issuer(app)
+  defp do_get_issuer(@default_app), do: Application.fetch_env!(@default_app, :issuer)
+  defp do_get_issuer(app), do: Application.fetch_env!(app, @default_app) |> Keyword.fetch!(:issuer)
 
-  @spec verify_token(String.t()) ::
+  @spec verify_token(String.t(), atom()) ::
           {:error, String.t()} | {:ok, String.t(), JOSE.JWT.t()}
   @doc ~S"""
   Verifies a token agains google's public keys. Returns {:ok, user_id, claims} if successful. {:error, _} otherwise.
@@ -33,8 +38,8 @@ defmodule ExFirebaseAuth.Token do
       iex> ExFirebaseAuth.Token.verify_token("ey.some.token")
       {:error, "Invalid JWT header, `kid` missing"}
   """
-  def verify_token(token_string) do
-    issuer = issuer()
+  def verify_token(token_string, app \\ @default_app) do
+    issuer = issuer(app)
 
     with {:jwtheader, %{fields: %{"kid" => kid}}} <- peek_token_kid(token_string),
          # read key from store
