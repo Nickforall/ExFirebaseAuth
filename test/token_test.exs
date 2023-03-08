@@ -46,6 +46,31 @@ defmodule ExFirebaseAuth.TokenTest do
       assert iss_claim == issuer
     end
 
+    test "Does succeed on correct token with specific app" do
+      issuer = Enum.random(?a..?z)
+      Application.put_env(:my_app, :ex_firebase_auth, issuer: issuer)
+
+      sub = Enum.random(?a..?z)
+      time_in_future = DateTime.utc_now() |> DateTime.add(360, :second) |> DateTime.to_unix()
+      claims = %{"exp" => time_in_future}
+      valid_token = Mock.generate_token(sub, claims, :my_app)
+      assert {:ok, ^sub, jwt} = Token.verify_token(valid_token, :my_app)
+
+      %JOSE.JWT{
+        fields: %{
+          "iss" => iss_claim,
+          "sub" => sub_claim
+        }
+      } = jwt
+
+      assert sub_claim == sub
+      assert iss_claim == issuer
+    end
+
+    test "Does raise on referencing application with bad config" do
+      assert_raise ArgumentError, fn -> Token.verify_token("any_toke", :my_app) end
+    end
+
     test "Does raise on no issuer being set" do
       Application.put_env(:ex_firebase_auth, :issuer, "issuer")
       valid_token = Mock.generate_token("subsub")
