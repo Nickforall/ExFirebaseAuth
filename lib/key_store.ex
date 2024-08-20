@@ -58,7 +58,7 @@ defmodule ExFirebaseAuth.KeyStore do
 
           :warn ->
             unless key_store_fail_strategy() == :silent do
-              Logger.warn("Fetching firebase auth certificates failed. Retrying again shortly.")
+              Logger.warning("Fetching firebase auth certificates failed. Retrying again shortly.")
             end
 
             schedule_refresh(10)
@@ -87,7 +87,7 @@ defmodule ExFirebaseAuth.KeyStore do
     case ExFirebaseAuth.KeySource.fetch_certificates() do
       # keep trying with a lower interval, until then keep the old state
       :error ->
-        Logger.warn("Fetching firebase auth certificates failed, using old state and retrying...")
+        Logger.warning("Fetching firebase auth certificates failed, using old state and retrying...")
         schedule_refresh(10)
 
       # if everything went okay, refresh at the regular interval and store the returned keys in state
