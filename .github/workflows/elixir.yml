@@ -17,11 +17,11 @@ jobs:
     strategy:
       matrix:
         elixir:
-          - "1.11"
-          - "1.12"
+          - "1.16"
+          - "1.17"
         otp:
-          - "23"
-          - "24"
+          - "26"
+          - "27"
 
     steps:
       - name: Checkout
